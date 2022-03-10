@@ -16,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.46"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextName" />
+        app:layout_constraintTop_toBottomOf="@+id/spinnerTextName" />
 
     <ImageView
         android:id="@+id/imageView2"
@@ -45,15 +45,14 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="236dp"
         android:fontFamily="sans-serif-black"
-        android:text="  PUV Details"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/editTextName"
+    <Spinner
+        android:id="@+id/spinnerTextName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="268dp"
@@ -75,7 +74,8 @@
         android:fontFamily="sans-serif-black"
         android:text="Name"
         android:textSize="16sp"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/etMainName"
@@ -88,7 +88,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.579"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView2"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/button_scan"

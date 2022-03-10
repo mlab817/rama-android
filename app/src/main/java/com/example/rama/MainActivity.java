@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,7 +33,6 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
-import android.widget.EditText;
 import android.widget.ListView;
 
 import com.android.volley.AuthFailureError;
@@ -50,7 +50,17 @@ import java.util.List;
 import java.util.Map;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import org.json.JSONArray;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+    ArrayList<String> locationList = new ArrayList<>();
+    ArrayAdapter<String> locationAdapter;
+    RequestQueue requestQueue;
     /*
      * this is the url to our webservice
      * make sure you are using the ip instead of localhost
@@ -63,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //View objects
     private Button buttonSave;
-    private EditText editTextName;
+    private Spinner spinnerTextName;
     private ListView listViewNames;
 
     //List to store all the names
@@ -149,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         names = new ArrayList<>();
 
         buttonSave = (Button) findViewById(R.id.buttonSave);
-        editTextName = (EditText) findViewById(R.id.editTextName);
+        spinnerTextName = (Spinner) findViewById(R.id.spinnerTextName);
         listViewNames = (ListView) findViewById(R.id.listViewNames);
 
         //adding click listener to button
@@ -170,6 +180,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //registering the broadcast receiver to update sync status
         registerReceiver(broadcastReceiver, new IntentFilter(DATA_SAVED_BROADCAST));
+
+        /*For Getting Location*/
+        requestQueue = Volley.newRequestQueue(this);
+        spinnerTextName = findViewById(R.id.spinnerTextName);
+//        String url = "http://192.168.31.205/sample_android_spinnerv2/scan_location.php?username="+selectedCountry;
+        String url = "http://192.168.31.205/sample_android_spinnerv2/scan_location.php?username="+ "0001";
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray jsonArray = response.getJSONArray("scan_location");
+                    for(int i=0; i<jsonArray.length();i++){
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        String locationName = jsonObject.optString("location");
+                        locationList.add(locationName);
+                        locationAdapter = new ArrayAdapter<>(MainActivity.this,
+                                android.R.layout.simple_spinner_item, locationList);
+                        locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        spinnerTextName.setAdapter(locationAdapter);
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        requestQueue.add(jsonObjectRequest);
+        spinnerTextName.setOnItemSelectedListener(this);
     }
 
     private void moveToLogin() {
@@ -208,12 +252,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(this, "Blank", Toast.LENGTH_SHORT).show();
             } else {
                 textView.setText(result.getContents());
-
                 finalValue = result.getContents();
-
-//                saveNameToServer();
-
-//                openScanner();
             }
         } else {
             Toast.makeText(this, "Blank", Toast.LENGTH_SHORT).show();
@@ -276,60 +315,77 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * */
     private void refreshList() {
         nameAdapter.notifyDataSetChanged();
+        listViewNames.invalidateViews();
+        listViewNames.refreshDrawableState();
     }
 
     /*
      * this method is saving the name to ther server
      * */
     private void saveNameToServer() {
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Saving Vehicle Details...");
-        progressDialog.show();
-        String displayTextView = null;
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd/HH:mm:ss");
-        String currentDateandTime = sdf.format(new Date());
+        final String spinner = spinnerTextName.getSelectedItem().toString().trim();
+//        final String platenumber = finalValue;
+        if (spinner.matches("")) {
+            Toast.makeText(MainActivity.this, "Location is Empty...", Toast.LENGTH_SHORT).show();
+        }
 
-        final String name = editTextName.getText().toString().trim() + "/" + username + "/" + fullname + "/" + finalValue + "/" + currentDateandTime;
+        else if (textView.getText().toString().length() == 0) {
+            Toast.makeText(MainActivity.this, "Scan Vehicle To Continue", Toast.LENGTH_SHORT).show();
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_SAVE_NAME,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        progressDialog.dismiss();
-                        try {
-                            JSONObject obj = new JSONObject(response);
-                            if (!obj.getBoolean("error")) {
-                                //if there is a success
-                                //storing the name to sqlite with status synced
-                                saveNameToLocalStorage((name), NAME_SYNCED_WITH_SERVER);
-                            } else {
-                                //if there is some error
-                                //saving the name to sqlite with status unsynced
-                                saveNameToLocalStorage(name, NAME_NOT_SYNCED_WITH_SERVER);
+        } else {
+//            Toast.makeText(MainActivity.this, "Submitted", Toast.LENGTH_SHORT).show();
+            final ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Saving Vehicle Details...");
+            progressDialog.show();
+            String displayTextView = null;
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd/HH:mm:ss");
+            String currentDateandTime = sdf.format(new Date());
+
+            final String name = spinnerTextName.getSelectedItem().toString().trim() + "/" + username + "/" + fullname + "/" + finalValue + "/" + currentDateandTime;
+
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_SAVE_NAME,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            progressDialog.dismiss();
+                            try {
+                                JSONObject obj = new JSONObject(response);
+                                if (!obj.getBoolean("error")) {
+                                    //if there is a success
+                                    //storing the name to sqlite with status synced
+                                    saveNameToLocalStorage((name), NAME_SYNCED_WITH_SERVER);
+                                } else {
+                                    //if there is some error
+                                    //saving the name to sqlite with status unsynced
+                                    saveNameToLocalStorage(name, NAME_NOT_SYNCED_WITH_SERVER);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        progressDialog.dismiss();
-                        //on error storing the name to sqlite with status unsynced
-                        saveNameToLocalStorage(name, NAME_NOT_SYNCED_WITH_SERVER);
-                    }
-                }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("name", name);
-                return params;
-            }
-        };
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            progressDialog.dismiss();
+                            //on error storing the name to sqlite with status unsynced
+                            saveNameToLocalStorage(name, NAME_NOT_SYNCED_WITH_SERVER);
+                        }
+                    }) {
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("name", name);
+                    return params;
+                }
+            };
 
-        VolleySingleton.getInstance(this).addToRequestQueue(stringRequest);
+            VolleySingleton.getInstance(this).addToRequestQueue(stringRequest);
+
+            textView.setText("");
+        }
     }
 
     //saving the name to local storage
@@ -343,5 +399,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         saveNameToServer();
+    }
+
+    /*For Getting Location*/
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 }

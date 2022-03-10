@@ -61,13 +61,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onResponse(Call<Login> call, Response<Login> response) {
                 if(response.body() != null && response.isSuccessful() && response.body().isStatus()){
-
-                    // Ini untuk menyimpan sesi
                     sessionManager = new SessionManager(LoginActivity.this);
                     LoginData loginData = response.body().getLoginData();
                     sessionManager.createLoginSession(loginData);
 
-                    //Ini untuk pindah
                     Toast.makeText(LoginActivity.this, response.body().getLoginData().getName(), Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
