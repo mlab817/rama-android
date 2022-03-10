@@ -8,8 +8,10 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -20,6 +22,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
@@ -44,6 +48,7 @@ import com.android.volley.toolbox.StringRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -173,8 +178,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onReceive(Context context, Intent intent) {
 
-                //loading the names again
-                loadNames();
+        //loading the names again
+        loadNames();
             }
         };
 
@@ -182,25 +187,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         registerReceiver(broadcastReceiver, new IntentFilter(DATA_SAVED_BROADCAST));
 
         /*For Getting Location*/
+
         requestQueue = Volley.newRequestQueue(this);
         spinnerTextName = findViewById(R.id.spinnerTextName);
-//        String url = "http://192.168.31.205/sample_android_spinnerv2/scan_location.php?username="+selectedCountry;
-        String url = "http://192.168.31.205/sample_android_spinnerv2/scan_location.php?username="+ "0001";
+        String url = "https://edsabuswaymonitoring.online/assets/androidStudio/getLocation.php?username="+ username;
+        final SharedPreferences sharedPreferences = getSharedPreferences("localpref", 0);
+        NetworkInfo networkInfo = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        if (networkInfo == null || !networkInfo.isConnected()) {
+            this.locationList = (ArrayList) new Gson().fromJson(sharedPreferences.getString("pref_data", null), new TypeToken<ArrayList<String>>() {
+            }.getType());
+            locationAdapter = new ArrayAdapter<>(MainActivity.this,
+                    android.R.layout.simple_spinner_item, locationList);
+            locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerTextName.setAdapter(locationAdapter);
+            Toast.makeText(this, "Offline Mode", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        @SuppressLint("CommitPrefEdits") final SharedPreferences.Editor editor = sharedPreferences.edit();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
                 url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     JSONArray jsonArray = response.getJSONArray("scan_location");
-                    for(int i=0; i<jsonArray.length();i++){
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        String locationName = jsonObject.optString("location");
-                        locationList.add(locationName);
+                    if (jsonArray.length() != 0) {
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            String locationName = jsonObject.optString("location");
+                            locationList.add(locationName);
+                            locationAdapter = new ArrayAdapter<>(MainActivity.this,
+                                    android.R.layout.simple_spinner_item, locationList);
+                            locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            spinnerTextName.setAdapter(locationAdapter);
+                            editor.putString("pref_data", new Gson().toJson(MainActivity.this.locationList)).apply();
+                        }
+                        return;
+                    } else {
+                        Gson gson = new Gson();
+                        String value = sharedPreferences.getString("pref_data", null);
+                        Type type = new TypeToken<ArrayList<String>>() {
+                        }.getType();
+                        MainActivity.this.locationList = (ArrayList) gson.fromJson(value, type);
                         locationAdapter = new ArrayAdapter<>(MainActivity.this,
                                 android.R.layout.simple_spinner_item, locationList);
                         locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         spinnerTextName.setAdapter(locationAdapter);
-
+                        Toast.makeText(MainActivity.this, "Maintenance Mode", Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -308,6 +341,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         nameAdapter = new NameAdapter(this, R.layout.names, names);
         listViewNames.setAdapter(nameAdapter);
+        refreshList();
     }
 
     /*
@@ -385,6 +419,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             VolleySingleton.getInstance(this).addToRequestQueue(stringRequest);
 
             textView.setText("");
+            refreshList();
         }
     }
 
