@@ -351,6 +351,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         nameAdapter.notifyDataSetChanged();
         listViewNames.invalidateViews();
         listViewNames.refreshDrawableState();
+        names.clear();
     }
 
     /*
