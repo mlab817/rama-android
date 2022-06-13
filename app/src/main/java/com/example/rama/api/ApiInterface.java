@@ -9,5 +9,10 @@ public interface ApiInterface {
             @Query("username") String username,
             @Query("password") String password
     );
+
+    @GET("androidlogin")
+    Call<Login> loginQRResponse(
+            @Query("scannedQRValue") String scannedQRValue
+    );
 }
 

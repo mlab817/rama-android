@@ -2,6 +2,7 @@ package com.example.rama;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,13 +20,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     EditText etUsername, etPassword;
     Button btnLogin, tvLoginViaQR;
     String Username, Password;
-    TextView tvRegister;
     ApiInterface apiInterface;
     SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_login);
 
         etUsername = findViewById(R.id.etUsername);
@@ -45,11 +46,23 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.btnLogin:
                 Username = etUsername.getText().toString();
                 Password = etPassword.getText().toString();
-                login(Username,Password);
+
+                if (TextUtils.isEmpty(Username)) {
+                    etUsername.setError("Employee ID / Username cannot be empty.");
+                }
+
+                if (TextUtils.isEmpty(Password)) {
+                    etPassword.setError("Password cannot be empty.");
+                }
+
+                if (!TextUtils.isEmpty(Username) && !TextUtils.isEmpty(Password)) {
+                    login(Username,Password);
+                }
                 break;
             case R.id.tvLoginViaQR:
-                Intent intent = new Intent(this, LoginViaQRActivity.class);
+                Intent intent = new Intent(this, LoginQR.class);
                 startActivity(intent);
+                finish();
                 break;
         }
     }
@@ -61,11 +74,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onResponse(Call<Login> call, Response<Login> response) {
                 if(response.body() != null && response.isSuccessful() && response.body().isStatus()){
+                    Toast.makeText(LoginActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+
                     sessionManager = new SessionManager(LoginActivity.this);
                     LoginData loginData = response.body().getLoginData();
                     sessionManager.createLoginSession(loginData);
 
-                    Toast.makeText(LoginActivity.this, response.body().getLoginData().getName(), Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();

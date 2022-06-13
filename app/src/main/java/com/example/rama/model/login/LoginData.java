@@ -10,6 +10,9 @@ public class LoginData {
     @SerializedName("username")
     private String username;
 
+    @SerializedName("updated")
+    private boolean updated;
+
     public void setUserid(String userid) {
         this.userid = userid;
     }
@@ -32,6 +35,14 @@ public class LoginData {
 
     public String getUsername() {
         return username;
+    }
+
+    public void setUpdated(boolean updated) {
+        this.updated = updated;
+    }
+
+    public boolean getUpdated() {
+        return updated;
     }
 }
 

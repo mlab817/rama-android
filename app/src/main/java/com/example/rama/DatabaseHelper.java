@@ -17,6 +17,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_STATUS = "status";
+    public static final String COLUMN_DETAIL = "detail";
 
     //database version
     private static final int DB_VERSION = 1;
@@ -29,9 +30,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //creating the database
     @Override
     public void onCreate(SQLiteDatabase db) {
+        String sqlDrop = "DROP TABLE IF EXISTS " + TABLE_NAME;
+        db.execSQL(sqlDrop);
+
         String sql = "CREATE TABLE " + TABLE_NAME
                 + "(" + COLUMN_ID +
                 " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_NAME +
+                " VARCHAR, " + COLUMN_DETAIL +
                 " VARCHAR, " + COLUMN_STATUS +
                 " TINYINT);";
         db.execSQL(sql);
@@ -40,9 +45,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //upgrading the database
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        String sql = "DROP TABLE IF EXISTS Persons";
-        db.execSQL(sql);
-        onCreate(db);
+
     }
 
     /*
@@ -52,11 +55,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * 0 means the name is synced with the server
      * 1 means the name is not synced with the server
      * */
-    public boolean addName(String name, int status) {
+    public boolean addName(String name, String detail, int status) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
         contentValues.put(COLUMN_NAME, name);
+        contentValues.put(COLUMN_DETAIL, detail);
         contentValues.put(COLUMN_STATUS, status);
 
 

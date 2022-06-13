@@ -6,31 +6,108 @@
     android:layout_height="match_parent"
     tools:context=".LoginActivity">
 
+    <EditText
+        android:id="@+id/etUsername"
+        android:layout_width="340dp"
+        android:layout_height="59dp"
+        android:width="150dp"
+        android:drawableLeft="@drawable/ic_baseline_person_24"
+        android:drawablePadding="24dp"
+        android:hint="Employee ID"
+        android:minHeight="48dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.488" />
+
+    <TextView
+        android:id="@+id/tvLogin6"
+        android:layout_width="450dp"
+        android:layout_height="35dp"
+        android:width="250dp"
+        android:text="ROUTE ASSESSMENT"
+        android:textAlignment="center"
+        android:textColor="#e14344"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.461"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.344" />
+
+    <TextView
+        android:id="@+id/tvLogin7"
+        android:layout_width="450dp"
+        android:layout_height="35dp"
+        android:width="250dp"
+        android:text="AND MONITORING APPLICATION"
+        android:textAlignment="center"
+        android:textColor="#e14344"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.512"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.383" />
+
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="343dp"
+        android:layout_height="55dp"
+        android:backgroundTint="#e14344"
+        android:text="Login"
+        android:textColor="#ffffff"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.801" />
+
     <Button
         android:id="@+id/tvLoginViaQR"
         android:layout_width="343dp"
         android:layout_height="55dp"
-        android:backgroundTint="#0035AA"
-        android:text="Login Via QR Codes"
+        android:backgroundTint="#e14344"
+        android:text="Login Via QR Code"
+        android:textColor="#ffffff"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.485"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.741"
-        android:visibility="gone"/>
+        app:layout_constraintVertical_bias="0.917" />
+
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="338dp"
+        android:layout_height="60dp"
+        android:width="250dp"
+        android:drawableLeft="@drawable/ic_baseline_lock_24"
+        android:drawablePadding="24dp"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:minHeight="48dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.52"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.606" />
 
     <ImageView
         android:id="@+id/imageView4"
-        android:layout_width="400dp"
-        android:layout_height="100dp"
+        android:layout_width="625dp"
+        android:layout_height="175dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.454"
+        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.958"
-        app:srcCompat="@drawable/rama2_0" />
+        app:layout_constraintVertical_bias="0.078"
+        app:srcCompat="@drawable/login_logo" />
 
     <ImageView
         android:id="@+id/logo4"
@@ -41,54 +118,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.027"
-        app:srcCompat="@drawable/ltfrb_logo" />
-
-    <TextView
-        android:id="@+id/tvPleaseLogin5"
-        android:layout_width="384dp"
-        android:layout_height="35dp"
-        android:width="250dp"
-        android:fontFamily="sans-serif-black"
-        android:text="LOGIN"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.407"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.293" />
-
-    <EditText
-        android:id="@+id/etUsername"
-        android:layout_width="340dp"
-        android:layout_height="59dp"
-        android:width="150dp"
-        android:drawablePadding="24dp"
-        android:hint="Username"
-        android:minHeight="48dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.464"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.412" />
-
-    <EditText
-        android:id="@+id/etPassword"
-        android:layout_width="338dp"
-        android:layout_height="60dp"
-        android:width="250dp"
-        android:drawablePadding="24dp"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:minHeight="48dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.493"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.526" />
+        app:srcCompat="@drawable/ltfrb_logo"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/button"
@@ -104,19 +135,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.516"
         android:visibility="gone"/>
-
-    <Button
-        android:id="@+id/btnLogin"
-        android:layout_width="343dp"
-        android:layout_height="55dp"
-        android:backgroundTint="#0035AA"
-        android:text="Login"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.485"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.627" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

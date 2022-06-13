@@ -14,6 +14,7 @@ public class SessionManager {
     public static final String USERID = "userid";
     public static final String USERNAME = "username";
     public static final String FULLNAME = "name";
+    public static final String IS_UPDATED = "updated";
 
     public SessionManager (Context context){
         this._context = context;
@@ -26,6 +27,7 @@ public class SessionManager {
         editor.putString(USERID, user.getUserid());
         editor.putString(USERNAME, user.getUsername());
         editor.putString(FULLNAME, user.getName());
+        editor.putBoolean(IS_UPDATED, user.getUpdated());
         editor.commit();
     }
 
@@ -46,4 +48,7 @@ public class SessionManager {
         return sharedPreferences.getBoolean(IS_LOGGED_IN, false);
     }
 
+    public boolean isUpdated(){
+        return sharedPreferences.getBoolean(IS_UPDATED, false);
+    }
 }

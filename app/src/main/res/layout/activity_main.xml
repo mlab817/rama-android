@@ -6,63 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/buttonSave"
-        android:layout_width="120dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="#0035AA"
-        android:text="@string/submit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.46"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinnerTextName" />
-
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="162dp"
-        android:layout_height="105dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.538"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ltfrb_logo" />
-
     <ListView
         android:id="@+id/listViewNames"
-        android:layout_width="371dp"
-        android:layout_height="109dp"
-        android:layout_marginTop="404dp"
+        android:layout_width="370dp"
+        android:layout_height="220dp"
+        android:layout_marginTop="492dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.4"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/txtPUVDetails"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="236dp"
-        android:fontFamily="sans-serif-black"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Spinner
-        android:id="@+id/spinnerTextName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="268dp"
-        android:layout_weight="3"
-        android:height="50dp"
-        android:fontFamily="sans-serif-black"
-        android:hint="Enter Location"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.487"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -88,32 +38,156 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.579"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2"
+        app:layout_constraintTop_toBottomOf="parent"
         android:visibility="gone"/>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="312dp"
+        android:layout_height="163dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/rama2_1" />
+
+    <Button
+        android:id="@+id/buttonSave"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="168dp"
+        android:backgroundTint="#e14344"
+        android:text="@string/submit"
+        android:textColor="#fff"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerTextName" />
+
+    <TextView
+        android:id="@+id/txtTrip"
+        android:layout_width="130dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="288dp"
+        android:fontFamily="sans-serif-black"
+        android:text="TRIP"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.8"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtBound"
+        android:layout_width="130dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="288dp"
+        android:fontFamily="sans-serif-black"
+        android:text="BOUND"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.195"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RadioGroup
+        android:layout_width="130dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="316dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.195"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RadioButton
+            android:id="@+id/nb"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:text="@string/nb"
+            android:textSize="15sp" />
+
+        <RadioButton
+            android:id="@+id/sb"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:text="@string/sb"
+            android:textSize="15sp" />
+    </RadioGroup>
+
+    <RadioGroup
+        android:layout_width="130dp"
+        android:layout_height="105dp"
+        android:layout_marginTop="316dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.8"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RadioButton
+            android:id="@+id/start"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:text="@string/start"
+            android:textSize="15sp" />
+
+        <RadioButton
+            android:id="@+id/end"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:text="@string/end"
+            android:textSize="15sp" />
+
+        <RadioButton
+            android:id="@+id/intransit"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:text="@string/intransit"
+            android:textSize="15sp" />
+    </RadioGroup>
+
+    <Spinner
+        android:id="@+id/spinnerTextName"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="248dp"
+        android:layout_weight="3"
+        android:height="50dp"
+        android:fontFamily="sans-serif-black"
+        android:hint="Enter Location"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button_scan"
         android:layout_width="245dp"
         android:layout_height="60dp"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="176dp"
         android:width="50dp"
-        android:backgroundTint="#0035AA"
-        android:text="Click to Scan Vehicle"
+        android:backgroundTint="#e14344"
+        android:text="Tap to Scan Vehicle"
         android:textColor="#fff"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.451"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="229dp"
-        android:layout_height="100dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <TextView
+        android:id="@+id/txtPUVDetails"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="140dp"
+        android:fontFamily="sans-serif-black"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.87"
-        app:srcCompat="@drawable/rama2_0" />
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

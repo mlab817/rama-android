@@ -48,8 +48,10 @@ public class NameAdapter extends ArrayAdapter<Name> {
         //else displaying synced icon
         if (name.getStatus() == 0)
             imageViewStatus.setBackgroundResource(R.drawable.stopwatch);
-        else
+        else if (name.getStatus() == 1)
             imageViewStatus.setBackgroundResource(R.drawable.success);
+        else
+            imageViewStatus.setBackgroundResource(R.drawable.rejected);
 
         return listViewItem;
     }

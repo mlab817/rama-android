@@ -1,4 +1,5 @@
 package com.example.rama;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +26,7 @@ public class NetworkStateChecker extends BroadcastReceiver {
     private Context context;
     private DatabaseHelper db;
 
+    @SuppressLint("Range")
     @Override
     public void onReceive(Context context, Intent intent) {
         this.context = context;
@@ -41,14 +43,17 @@ public class NetworkStateChecker extends BroadcastReceiver {
 
                 //getting all the unsynced names
                 Cursor cursor = db.getUnsyncedNames();
-                if (cursor.moveToFirst()) {
-                    do {
-                        //calling the method to save the unsynced name to MySQL
-                        saveName(
-                                cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID)),
-                                cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME))
-                        );
-                    } while (cursor.moveToNext());
+                cursor.moveToFirst();
+                while(!cursor.isAfterLast()) {
+
+                    //calling the method to save the unsynced name to MySQL
+                    saveName(
+                            cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID)),
+                            cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME)),
+                            cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_DETAIL))
+                    );
+
+                    cursor.moveToNext();
                 }
             }
         }
@@ -60,7 +65,7 @@ public class NetworkStateChecker extends BroadcastReceiver {
      * if the name is successfully sent
      * we will update the status as synced in SQLite
      * */
-    private void saveName(final int id, final String name) {
+    private void saveName(final int id, final String name, final String detail) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, MainActivity.URL_SAVE_NAME,
                 new Response.Listener<String>() {
                     @Override
@@ -89,11 +94,11 @@ public class NetworkStateChecker extends BroadcastReceiver {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
                 params.put("name", name);
+                params.put("detail", detail);
                 return params;
             }
         };
 
         VolleySingleton.getInstance(context).addToRequestQueue(stringRequest);
     }
-
 }

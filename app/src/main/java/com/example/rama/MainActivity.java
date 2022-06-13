@@ -7,17 +7,23 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.UserManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,6 +70,7 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     ArrayList<String> locationList = new ArrayList<>();
+    ArrayList<String> locationIDList = new ArrayList<>();
     ArrayAdapter<String> locationAdapter;
     RequestQueue requestQueue;
     /*
@@ -87,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //1 means data is synced and 0 means data is not synced
     public static final int NAME_SYNCED_WITH_SERVER = 1;
     public static final int NAME_NOT_SYNCED_WITH_SERVER = 0;
+    //2 means data is rejected, qr code probably has a different data composition / incorrect format
+    public static final int NAME_REJECTED = 2;
 
     //a broadcast to know weather the data is synced or not
     public static final String DATA_SAVED_BROADCAST = "net.simplifiedcoding.datasaved";
@@ -100,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /*Login Information*/
     TextView etUsername, etName;
     SessionManager sessionManager;
-    String username, fullname, finalValue;
+    String username, fullname, userid, finalValue;
 
     /*BarCode & QRCode Scanner*/
     private static final int CAMERA_PERMISSION_CODE = 101;
@@ -111,8 +120,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         sessionManager = new SessionManager(MainActivity.this);
+
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Notice")
+                .setMessage("The system has detected that you are using an old/default password. For your own security, we highly recommend you to update your password immediately.")
+                .setPositiveButton("Update password", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent = new Intent(MainActivity.this, ChangePassword.class);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("Later", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                })
+                .create();
+
         if (!sessionManager.isLoggedIn()) {
             moveToLogin();
+        } else {
+            if (!sessionManager.isUpdated()) {
+                alertDialog.show();
+            }
         }
 
         /*Login Information*/
@@ -121,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         username = sessionManager.getUserDetail().get(SessionManager.USERNAME);
         fullname = sessionManager.getUserDetail().get(SessionManager.FULLNAME);
+        userid = sessionManager.getUserDetail().get(SessionManager.USERID);
 
         etUsername.setText(username);
         etName.setText(fullname);
@@ -190,17 +223,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         requestQueue = Volley.newRequestQueue(this);
         spinnerTextName = findViewById(R.id.spinnerTextName);
-        String url = "https://edsabuswaymonitoring.online/assets/androidStudio/getLocation.php?username="+ username;
+        String url = "https://edsabuswaymonitoring.online/assets/androidStudio/getStation.php?id="+ userid;
         final SharedPreferences sharedPreferences = getSharedPreferences("localpref", 0);
         NetworkInfo networkInfo = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
         if (networkInfo == null || !networkInfo.isConnected()) {
             this.locationList = (ArrayList) new Gson().fromJson(sharedPreferences.getString("pref_data", null), new TypeToken<ArrayList<String>>() {
             }.getType());
+            this.locationIDList = (ArrayList) new Gson().fromJson(sharedPreferences.getString("pref_id", null), new TypeToken<ArrayList<String>>() {
+            }.getType());
             locationAdapter = new ArrayAdapter<>(MainActivity.this,
                     android.R.layout.simple_spinner_item, locationList);
             locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerTextName.setAdapter(locationAdapter);
-            Toast.makeText(this, "Offline Mode", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Offline Mode.", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -210,30 +245,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    JSONArray jsonArray = response.getJSONArray("scan_location");
+                    JSONArray jsonArray = response.getJSONArray("stations");
                     if (jsonArray.length() != 0) {
                         for (int i = 0; i < jsonArray.length(); i++) {
+                            //Add dropdown item for hint
+                            if(i == 0){
+                                locationList.add("- SELECT LOCATION -");
+                                locationIDList.add("0");
+                            }
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
-                            String locationName = jsonObject.optString("location");
+                            String locationName = jsonObject.optString("name");
+                            String locationID = jsonObject.optString("station_id");
                             locationList.add(locationName);
+                            locationIDList.add(locationID);
                             locationAdapter = new ArrayAdapter<>(MainActivity.this,
                                     android.R.layout.simple_spinner_item, locationList);
                             locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                             spinnerTextName.setAdapter(locationAdapter);
+                            spinnerTextName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                    // First item will be gray
+                                    if (position == 0) {
+                                        ((TextView) view).setTextColor(Color.GRAY);
+                                    }
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> parent) {
+                                }
+                            });
                             editor.putString("pref_data", new Gson().toJson(MainActivity.this.locationList)).apply();
+                            editor.putString("pref_id", new Gson().toJson(MainActivity.this.locationIDList)).apply();
                         }
                         return;
                     } else {
                         Gson gson = new Gson();
                         String value = sharedPreferences.getString("pref_data", null);
+                        String valueID = sharedPreferences.getString("pref_id", null);
                         Type type = new TypeToken<ArrayList<String>>() {
                         }.getType();
                         MainActivity.this.locationList = (ArrayList) gson.fromJson(value, type);
+                        MainActivity.this.locationIDList = (ArrayList) gson.fromJson(valueID, type);
                         locationAdapter = new ArrayAdapter<>(MainActivity.this,
                                 android.R.layout.simple_spinner_item, locationList);
                         locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         spinnerTextName.setAdapter(locationAdapter);
-                        Toast.makeText(MainActivity.this, "Maintenance Mode", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "Maintenance Mode.", Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -259,6 +317,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
+        MenuItem menuLogout = menu.findItem(R.id.actionLogout);
+        menuLogout.setTitle("Logout (" + fullname + ")");
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -268,6 +328,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.actionLogout:
                 sessionManager.logoutSession();
                 moveToLogin();
+                return true;
+            case R.id.actionChangePassword:
+                Intent intent = new Intent(MainActivity.this, ChangePassword.class);
+                startActivity(intent);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -282,13 +347,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
             if (result.getContents() == null) {
-                Toast.makeText(this, "Blank", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Scan cancelled!", Toast.LENGTH_SHORT).show();
             } else {
-                textView.setText(result.getContents());
+                textView.setText("SCANNED DATA: " + result.getContents());
                 finalValue = result.getContents();
             }
         } else {
-            Toast.makeText(this, "Blank", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Scan cancelled!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -333,6 +398,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             do {
                 @SuppressLint("Range") Name name = new Name(
                         cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME)),
+                        cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_DETAIL)),
                         cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_STATUS))
                 );
                 names.add(name);
@@ -351,7 +417,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         nameAdapter.notifyDataSetChanged();
         listViewNames.invalidateViews();
         listViewNames.refreshDrawableState();
-        names.clear();
     }
 
     /*
@@ -360,25 +425,54 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void saveNameToServer() {
 
         final String spinner = spinnerTextName.getSelectedItem().toString().trim();
-//        final String platenumber = finalValue;
-        if (spinner.matches("")) {
-            Toast.makeText(MainActivity.this, "Location is Empty...", Toast.LENGTH_SHORT).show();
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd/HH:mm:ss");
+        String currentDateAndTime = sdf.format(new Date());
+        RadioButton northBound, southBound, startTrip, endTrip, inTransit;
+        String bound = null;
+        String trip = null;
+        northBound = (RadioButton) findViewById(R.id.nb);
+        southBound = (RadioButton) findViewById(R.id.sb);
+        startTrip = (RadioButton) findViewById(R.id.start);
+        endTrip = (RadioButton) findViewById(R.id.end);
+        inTransit = (RadioButton) findViewById(R.id.intransit);
+
+        if (textView.getText().toString().length() == 0) {
+            Toast.makeText(MainActivity.this, "Scan vehicle to continue.", Toast.LENGTH_SHORT).show();
         }
 
-        else if (textView.getText().toString().length() == 0) {
-            Toast.makeText(MainActivity.this, "Scan Vehicle To Continue", Toast.LENGTH_SHORT).show();
+        if (spinner.matches("- SELECT LOCATION -")) {
+            Toast.makeText(MainActivity.this, "Please select location.", Toast.LENGTH_SHORT).show();
+        }
 
-        } else {
-//            Toast.makeText(MainActivity.this, "Submitted", Toast.LENGTH_SHORT).show();
-            final ProgressDialog progressDialog = new ProgressDialog(this);
+        if (!northBound.isChecked() && !southBound.isChecked()) {
+            Toast.makeText(MainActivity.this, "Please select bound.", Toast.LENGTH_SHORT).show();
+        }
+
+        if (!startTrip.isChecked() && !endTrip.isChecked() && !inTransit.isChecked()) {
+            Toast.makeText(MainActivity.this, "Please select trip.", Toast.LENGTH_SHORT).show();
+        }
+
+        if (textView.getText().toString().length() != 0 && !spinner.matches("- SELECT LOCATION -") && (northBound.isChecked() || southBound.isChecked()) && (startTrip.isChecked() || endTrip.isChecked() || inTransit.isChecked())) {
+            if (northBound.isChecked()) {
+                bound = "NORTH";
+            } else if (southBound.isChecked()) {
+                bound = "SOUTH";
+            }
+
+            if (startTrip.isChecked()) {
+                trip = "START";
+            } else if (endTrip.isChecked()) {
+                trip = "END";
+            } else if (inTransit.isChecked()) {
+                trip = "IN TRANSIT";
+            }
+
             progressDialog.setMessage("Saving Vehicle Details...");
             progressDialog.show();
-            String displayTextView = null;
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd/HH:mm:ss");
-            String currentDateandTime = sdf.format(new Date());
-
-            final String name = spinnerTextName.getSelectedItem().toString().trim() + "/" + username + "/" + fullname + "/" + finalValue + "/" + currentDateandTime;
+            final String name = spinnerTextName.getSelectedItem().toString().trim() + "_" + bound + "_" + trip + "/" + username + "/" + fullname + "/" + finalValue + "/" + currentDateAndTime;
+            final String detail = locationIDList.get(spinnerTextName.getSelectedItemPosition()) + "/" + bound + "/" + trip + "/" + userid + "/" + finalValue + "/" + currentDateAndTime;
 
             StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_SAVE_NAME,
                     new Response.Listener<String>() {
@@ -390,11 +484,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 if (!obj.getBoolean("error")) {
                                     //if there is a success
                                     //storing the name to sqlite with status synced
-                                    saveNameToLocalStorage((name), NAME_SYNCED_WITH_SERVER);
+                                    saveNameToLocalStorage(name, detail, NAME_SYNCED_WITH_SERVER);
+                                    loadNames();
+                                    Toast.makeText(MainActivity.this, "Scanned data successfully submitted!", Toast.LENGTH_LONG).show();
                                 } else {
                                     //if there is some error
-                                    //saving the name to sqlite with status unsynced
-                                    saveNameToLocalStorage(name, NAME_NOT_SYNCED_WITH_SERVER);
+                                    if (obj.getString("message").compareTo("rejected")==0) {
+                                        saveNameToLocalStorage(name, detail, NAME_REJECTED);
+                                        loadNames();
+                                        Toast.makeText(MainActivity.this, "Scanned data rejected! Probably an old QR code or QR value has incorrect format.", Toast.LENGTH_LONG).show();
+                                    } else {
+                                        //saving the name to sqlite with status unsynced
+                                        saveNameToLocalStorage(name, detail, NAME_NOT_SYNCED_WITH_SERVER);
+                                        loadNames();
+                                        Toast.makeText(MainActivity.this, "Scanned data saved locally... Will be submitted once internet connectivity is restored.", Toast.LENGTH_LONG).show();
+                                    }
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -406,13 +510,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         public void onErrorResponse(VolleyError error) {
                             progressDialog.dismiss();
                             //on error storing the name to sqlite with status unsynced
-                            saveNameToLocalStorage(name, NAME_NOT_SYNCED_WITH_SERVER);
+                            saveNameToLocalStorage(name, detail, NAME_NOT_SYNCED_WITH_SERVER);
+                            loadNames();
+                            Toast.makeText(MainActivity.this, "Scanned data saved locally... Will be submitted once internet connectivity is restored.", Toast.LENGTH_LONG).show();
                         }
                     }) {
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
                     Map<String, String> params = new HashMap<>();
                     params.put("name", name);
+                    params.put("detail", detail);
                     return params;
                 }
             };
@@ -425,9 +532,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //saving the name to local storage
-    private void saveNameToLocalStorage(String name, int status) {
-        db.addName(name, status);
-        Name n = new Name(name, status);
+    private void saveNameToLocalStorage(String name, String detail, int status) {
+        db.addName(name, detail, status);
+        Name n = new Name(name, detail, status);
         names.add(n);
         refreshList();
     }

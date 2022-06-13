@@ -6,10 +6,12 @@ package com.example.rama;
 
 public class Name {
     private String name;
+    private String detail;
     private int status;
 
-    public Name(String name, int status) {
+    public Name(String name, String detail, int status) {
         this.name = name;
+        this.detail = detail;
         this.status = status;
     }
 
