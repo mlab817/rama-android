@@ -1,8 +1,8 @@
-package com.example.rama;
+package com.ltfrb.ltfrb_puvqrcodescanner;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import com.example.rama.model.login.LoginData;
+import com.ltfrb.ltfrb_puvqrcodescanner.model.login.LoginData;
 import java.util.HashMap;
 public class SessionManager {
 

@@ -1,5 +1,5 @@
-package com.example.rama.api;
-import com.example.rama.model.login.Login;
+package com.ltfrb.ltfrb_puvqrcodescanner.api;
+import com.ltfrb.ltfrb_puvqrcodescanner.model.login.Login;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
