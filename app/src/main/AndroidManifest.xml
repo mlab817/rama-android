@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.rama">
+    package="com.ltfrb.ltfrb_puvqrcodescanner">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -23,16 +23,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LTFRB_PUVQRCodeScanner"
         android:usesCleartextTraffic="true">
-        <activity android:name=".LoginQR" />
+        <activity android:name="com.ltfrb.ltfrb_puvqrcodescanner.LoginQR" />
         <activity
-            android:name=".ChangePassword"
+            android:name="com.ltfrb.ltfrb_puvqrcodescanner.ChangePassword"
             android:exported="false"
             android:label="@string/title_activity_change_password"
             android:theme="@style/Theme.LTFRB_PUVQRCodeScanner.NoActionBar" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.example.rama"
+            android:authorities="com.ltfrb.ltfrb_puvqrcodescanner"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -40,9 +40,9 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity android:name=".LoginActivity" />
+        <activity android:name="com.ltfrb.ltfrb_puvqrcodescanner.LoginActivity" />
         <activity
-            android:name=".SplashfileActivity"
+            android:name="com.ltfrb.ltfrb_puvqrcodescanner.SplashfileActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -50,10 +50,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name="com.ltfrb.ltfrb_puvqrcodescanner.MainActivity" />
 
         <receiver
-            android:name=".NetworkStateChecker"
+            android:name="com.ltfrb.ltfrb_puvqrcodescanner.NetworkStateChecker"
             android:exported="false">
             <intent-filter>
                 <action

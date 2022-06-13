@@ -1,4 +1,4 @@
-package com.example.rama;
+package com.ltfrb.ltfrb_puvqrcodescanner;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;

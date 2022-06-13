@@ -1,4 +1,4 @@
-package com.example.rama;
+package com.ltfrb.ltfrb_puvqrcodescanner;
 
 import org.junit.Test;
 

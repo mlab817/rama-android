@@ -1,4 +1,4 @@
-package com.example.rama;
+package com.ltfrb.ltfrb_puvqrcodescanner;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;

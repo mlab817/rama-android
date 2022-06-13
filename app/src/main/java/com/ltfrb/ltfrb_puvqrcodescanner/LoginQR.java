@@ -1,4 +1,4 @@
-package com.example.rama;
+package com.ltfrb.ltfrb_puvqrcodescanner;
 
 import android.Manifest;
 import android.content.Intent;
@@ -12,10 +12,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.example.rama.api.ApiClient;
-import com.example.rama.api.ApiInterface;
-import com.example.rama.model.login.Login;
-import com.example.rama.model.login.LoginData;
+import com.ltfrb.ltfrb_puvqrcodescanner.api.ApiClient;
+import com.ltfrb.ltfrb_puvqrcodescanner.api.ApiInterface;
+import com.ltfrb.ltfrb_puvqrcodescanner.model.login.Login;
+import com.ltfrb.ltfrb_puvqrcodescanner.model.login.LoginData;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 

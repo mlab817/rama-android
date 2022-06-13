@@ -1,4 +1,4 @@
-package com.example.rama.model.login;
+package com.ltfrb.ltfrb_puvqrcodescanner.model.login;
 import com.google.gson.annotations.SerializedName;
 public class LoginData {
     @SerializedName("userid")

@@ -1,4 +1,4 @@
-package com.example.rama.api;
+package com.ltfrb.ltfrb_puvqrcodescanner.api;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.Retrofit;
 public class ApiClient {
